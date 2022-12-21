@@ -19,6 +19,7 @@ class Clause {
     bool empty() const;
     bool is_unit();
     bool is_negative(std::shared_ptr<Literal> literal);
+    bool contains(std::shared_ptr<Literal> literal);
     std::shared_ptr<Literal> get_literal();
     friend std::ostream& operator<<(std::ostream& os, const Clause& clause);
 };

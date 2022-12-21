@@ -47,3 +47,7 @@ std::shared_ptr<Literal> Clause::get_literal() {
 bool Clause::is_negative(std::shared_ptr<Literal> literal) {
     return literals.find(literal)->second;
 }
+
+bool Clause::contains(std::shared_ptr<Literal> literal) {
+    return literals.find(literal) != literals.end();
+}

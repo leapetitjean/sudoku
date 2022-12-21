@@ -7,6 +7,7 @@ Sudoku::Sudoku(std::vector<std::vector<int>> grid) {
             for (int z = 0; z < 9; z++) {
                 std::shared_ptr<Literal> literal(new Literal(x, y, z));
                 literals[x][y].push_back(literal);
+                not_fixed_literals.insert(literals[x][y][z]);
                 one_to_n_clause->add_literal(literal, false);
             }
             formula.add_clause(one_to_n_clause);
@@ -93,6 +94,7 @@ Sudoku::Sudoku(std::vector<std::vector<int>> grid) {
                     literals[x][y][z].get()->negate();
                 }
                 literals[x][y][z].get()->set_fixed();
+                not_fixed_literals.erase(literals[x][y][z]);
                 formula.unit_propagate(literals[x][y][z]);
             }
         }
@@ -103,24 +105,17 @@ std::ostream& operator<<(std::ostream& os, const Sudoku& sudoku) {
     for (int x = 0; x < 9; x++) {
         for (int y = 0; y < 9; y++) {
             bool is_fixed = false;
-            os << "(" << x << ", " << y << ")" << std::endl;
             for (int z = 0; z < 9; z++) {
-                if (sudoku.literals[x][y][z].get()->is_fixed()) {
-                    os << sudoku.literals[x][y][z].get()->value() << " ";
-                } else {
-                    os << "? ";
+                 if (sudoku.literals[x][y][z].get()->value()) {
+                    os << z+1 << " ";
+                    is_fixed = true;
                 }
-                // if (sudoku.literals[x][y][z].get()->value()) {
-                //    os << z+1 << " ";
-                //    is_fixed = true;
-                //}
             }
-            os << std::endl;
-            // if (!is_fixed) {
-            //    os << 0 << " ";
-            //}
+            if (!is_fixed) {
+                os << 0 << " ";
+            }
         }
-        os << "---" << std::endl;
+        os << std::endl;
     }
     return os;
 }
@@ -139,8 +134,16 @@ void Sudoku::solve() {
         }
 
         l.get()->set_fixed();
+        not_fixed_literals.erase(l);
         formula.unit_propagate(l);
 
         c = formula.get_unit_clause();
+    }
+
+    for (std::unordered_set<std::shared_ptr<Literal>>::const_iterator literal = not_fixed_literals.begin(); literal != not_fixed_literals.end(); literal++) {
+        if (formula.is_pure_literal(*literal)) {
+            std::cout << *literal << std::endl;
+            formula.unit_propagate(*literal);
+        }
     }
 }

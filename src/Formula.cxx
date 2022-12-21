@@ -53,3 +53,21 @@ Clause* Formula::get_unit_clause() {
     }
     return nullptr;
 }
+
+bool Formula::is_pure_literal(std::shared_ptr<Literal> literal) {
+    bool first = true;
+    bool negative = false;
+    for (std::vector<Clause*>::const_iterator c = clauses.begin();
+         c != clauses.end(); c++) {
+        if ((*c)->contains(literal)) {
+            if (first) {
+                negative = (*c)->is_negative(literal);
+                first = false;
+            }
+            if (negative != (*c)->is_negative(literal)) {
+                return false;
+            }
+        }
+    }
+    return true;
+}

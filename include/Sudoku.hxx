@@ -13,6 +13,7 @@ class Sudoku {
         std::vector<std::vector<std::vector<std::shared_ptr<Literal>>>>(
             9, std::vector<std::vector<std::shared_ptr<Literal>>>(
                    9, std::vector<std::shared_ptr<Literal>>()));
+    std::unordered_set<std::shared_ptr<Literal>> not_fixed_literals;
     Formula formula;
 
    public:

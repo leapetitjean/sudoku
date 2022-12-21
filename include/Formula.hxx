@@ -18,6 +18,7 @@ class Formula {
     void clean();
     Clause* get_unit_clause();
     friend std::ostream& operator<<(std::ostream& os, const Formula& formula);
+    bool is_pure_literal(std::shared_ptr<Literal> literal);
 };
 
 #endif  // FORMULA_HXX
