@@ -5,7 +5,11 @@
 #include "Sudoku.hxx"
 
 int main(int argc, char* argv[]) {
-    std::string file_name("../data/example.txt");
+    if (argc < 2) {
+        std::cerr << "Usage: ./sudoku <file_name>" << std::endl;
+        return EXIT_FAILURE;
+    }
+    std::string file_name(argv[1]);
 
     std::string line;
     std::ifstream file(file_name);
