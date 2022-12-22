@@ -112,6 +112,10 @@ Sudoku::Sudoku(std::vector<std::vector<int>> grid) {
 }
 
 std::ostream& operator<<(std::ostream& os, const Sudoku& sudoku) {
+    if (! sudoku.feasible) {
+        os << "No solution" << std::endl;
+        return os;
+    }
     for (int x = 0; x < 9; x++) {
         for (int y = 0; y < 9; y++) {
             bool is_fixed = false;
@@ -132,7 +136,7 @@ std::ostream& operator<<(std::ostream& os, const Sudoku& sudoku) {
 }
 
 void Sudoku::solve() {
-    dpll(formula);
+    feasible = dpll(formula);
 }
 
 bool Sudoku::dpll(std::shared_ptr<Formula> f) {

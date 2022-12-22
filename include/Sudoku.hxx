@@ -8,6 +8,7 @@
 
 class Sudoku {
    private:
+    bool feasible = false;
     std::shared_ptr<Formula> formula;
 
    public:
