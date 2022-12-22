@@ -1,5 +1,20 @@
 #include "Formula.hxx"
 
+Formula::Formula(const Formula& formula) {
+    for (std::vector<Clause*>::const_iterator c = formula.clauses.begin();
+         c != formula.clauses.end(); c++) {
+        Clause* clause = new Clause(**c);
+        add_clause(clause);
+    }
+    for (std::unordered_map<std::string, bool>::const_iterator f = formula.assignments_fixed.begin(); f != formula.assignments_fixed.end(); f++) {
+        assignments_fixed.insert(std::make_pair(f->first, f->second));
+    }
+    for (std::unordered_map<std::string, bool>::const_iterator f = formula.assignments_not_fixed.begin(); f != formula.assignments_not_fixed.end(); f++) {
+        assignments_not_fixed.insert(std::make_pair(f->first, f->second));
+    }
+    empty_clause = formula.empty_clause;
+}
+
 std::ostream& operator<<(std::ostream& os, const Formula& formula) {
     os << "Formula( " << formula.clauses.size() << " ):" << std::endl;
     for (auto c : formula.clauses) {
@@ -10,6 +25,8 @@ std::ostream& operator<<(std::ostream& os, const Formula& formula) {
 
 void Formula::add_clause(Clause* clause) { clauses.push_back(clause); }
 
+void Formula::add_literal(std::string literal) { assignments_not_fixed.insert(std::make_pair(literal, false)); }
+
 bool Formula::value() {
     bool value = true;
     for (std::vector<Clause*>::const_iterator clause = clauses.begin();
@@ -19,11 +36,11 @@ bool Formula::value() {
     return value;
 }
 
-void Formula::unit_propagate(std::shared_ptr<Literal> literal) {
+void Formula::unit_propagate(std::string literal) {
     for (std::vector<Clause*>::const_iterator c = clauses.begin();
          c != clauses.end(); c++) {
         if (!(*c)->value()) {
-            (*c)->unit_propagate(literal);
+            (*c)->unit_propagate(literal, assignments_fixed.at(literal));
         }
     }
     clean();
@@ -54,7 +71,7 @@ Clause* Formula::get_unit_clause() {
     return nullptr;
 }
 
-bool Formula::is_pure_literal(std::shared_ptr<Literal> literal) {
+bool Formula::is_pure_literal(std::string literal) {
     bool first = true;
     bool negative = false;
     for (std::vector<Clause*>::const_iterator c = clauses.begin();
@@ -70,4 +87,21 @@ bool Formula::is_pure_literal(std::shared_ptr<Literal> literal) {
         }
     }
     return true;
+}
+
+void Formula::assign(std::string literal, bool value) {
+    assignments_not_fixed.at(literal) = value;
+}
+
+void Formula::set_fixed(std::string literal) {
+    bool value = assignments_not_fixed.at(literal);
+    assignments_not_fixed.erase(literal);
+    assignments_fixed.insert(std::make_pair(literal, value));
+}
+
+bool Formula::get_literal_value(std::string literal) {
+    if (assignments_not_fixed.find(literal) != assignments_not_fixed.end()) {
+        return assignments_not_fixed.at(literal);
+    }
+    return assignments_fixed.at(literal);
 }

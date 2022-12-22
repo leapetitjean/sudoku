@@ -1,7 +1,6 @@
 #ifndef CLAUSE_HXX
 #define CLAUSE_HXX
 
-#include <Literal.hxx>
 #include <iostream>
 #include <memory>
 #include <unordered_map>
@@ -9,18 +8,20 @@
 
 class Clause {
    private:
-    std::unordered_map<std::shared_ptr<Literal>, bool> literals;
+    std::unordered_map<std::string, bool> literals;
     bool is_true = false;
 
    public:
-    void add_literal(std::shared_ptr<Literal> literal, bool negative);
+    Clause() = default;
+    Clause(const Clause& clause);
+    void add_literal(std::string literal, bool negative);
     bool value() const;
-    void unit_propagate(std::shared_ptr<Literal> literal);
+    void unit_propagate(std::string literal, bool value);
     bool empty() const;
     bool is_unit();
-    bool is_negative(std::shared_ptr<Literal> literal);
-    bool contains(std::shared_ptr<Literal> literal);
-    std::shared_ptr<Literal> get_literal();
+    bool is_negative(std::string literal);
+    bool contains(std::string literal);
+    std::string get_literal();
     friend std::ostream& operator<<(std::ostream& os, const Clause& clause);
 };
 

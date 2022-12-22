@@ -9,16 +9,26 @@
 class Formula {
    private:
     std::vector<Clause*> clauses;
+    std::unordered_map<std::string, bool> assignments_not_fixed;
+    std::unordered_map<std::string, bool> assignments_fixed;
+    bool empty_clause = false;
 
    public:
+    Formula() = default;
+    Formula(const Formula& formula);
     void add_clause(Clause* clause);
+    void add_literal(std::string literal);
+    void assign(std::string literal, bool value);
+    void set_fixed(std::string literal);
+    bool get_literal_value(std::string literal);
     bool value();
-    void unit_propagate(std::shared_ptr<Literal> literal);
+    void unit_propagate(std::string literal);
     bool empty() const;
     void clean();
     Clause* get_unit_clause();
+    bool is_pure_literal(std::string literal);
+    inline bool has_empty_clause() { return empty_clause; };
     friend std::ostream& operator<<(std::ostream& os, const Formula& formula);
-    bool is_pure_literal(std::shared_ptr<Literal> literal);
 };
 
 #endif  // FORMULA_HXX

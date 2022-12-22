@@ -1,16 +1,18 @@
 #include "Sudoku.hxx"
 
 Sudoku::Sudoku(std::vector<std::vector<int>> grid) {
+    std::shared_ptr<Formula> f(new Formula());
+    formula = f;
+
     for (int x = 0; x < 9; x++) {
         for (int y = 0; y < 9; y++) {
             Clause* one_to_n_clause = new Clause();
             for (int z = 0; z < 9; z++) {
-                std::shared_ptr<Literal> literal(new Literal(x, y, z));
-                literals[x][y].push_back(literal);
-                not_fixed_literals.insert(literals[x][y][z]);
-                one_to_n_clause->add_literal(literal, false);
+                std::string name(std::to_string(x) + std::to_string(y) + std::to_string(z));
+                formula.get()->add_literal(name);
+                one_to_n_clause->add_literal(name, false);
             }
-            formula.add_clause(one_to_n_clause);
+            formula.get()->add_clause(one_to_n_clause);
         }
     }
 
@@ -19,11 +21,13 @@ Sudoku::Sudoku(std::vector<std::vector<int>> grid) {
             for (int x = 0; x < 8; x++) {
                 for (int i = x + 1; i < 9; i++) {
                     Clause* at_most_one_row_clause = new Clause();
-                    at_most_one_row_clause->add_literal(literals[x][y][z],
+                    std::string name1(std::to_string(x) + std::to_string(y) + std::to_string(z));
+                    std::string name2(std::to_string(i) + std::to_string(y) + std::to_string(z));
+                    at_most_one_row_clause->add_literal(name1,
                                                         true);
-                    at_most_one_row_clause->add_literal(literals[i][y][z],
+                    at_most_one_row_clause->add_literal(name2,
                                                         true);
-                    formula.add_clause(at_most_one_row_clause);
+                    formula->add_clause(at_most_one_row_clause);
                 }
             }
         }
@@ -34,11 +38,13 @@ Sudoku::Sudoku(std::vector<std::vector<int>> grid) {
             for (int y = 0; y < 8; y++) {
                 for (int i = y + 1; i < 9; i++) {
                     Clause* at_most_one_column_clause = new Clause();
-                    at_most_one_column_clause->add_literal(literals[x][y][z],
+                    std::string name1(std::to_string(x) + std::to_string(y) + std::to_string(z));
+                    std::string name2(std::to_string(x) + std::to_string(i) + std::to_string(z));
+                    at_most_one_column_clause->add_literal(name1,
                                                            true);
-                    at_most_one_column_clause->add_literal(literals[x][i][z],
+                    at_most_one_column_clause->add_literal(name2,
                                                            true);
-                    formula.add_clause(at_most_one_column_clause);
+                    formula->add_clause(at_most_one_column_clause);
                 }
             }
         }
@@ -51,11 +57,13 @@ Sudoku::Sudoku(std::vector<std::vector<int>> grid) {
                     for (int y = 0; y < 3; y++) {
                         for (int k = y + 1; k < 3; k++) {
                             Clause* at_most_one_sub_grid_1 = new Clause();
+                            std::string name1(std::to_string(3 * i + x) + std::to_string(3 * j + y) + std::to_string(z));
+                            std::string name2(std::to_string(3 * i + x) + std::to_string(3 * j + k) + std::to_string(z));
                             at_most_one_sub_grid_1->add_literal(
-                                literals[3 * i + x][3 * j + y][z], true);
+                                name1, true);
                             at_most_one_sub_grid_1->add_literal(
-                                literals[3 * i + x][3 * j + k][z], true);
-                            formula.add_clause(at_most_one_sub_grid_1);
+                                name2, true);
+                            formula->add_clause(at_most_one_sub_grid_1);
                         }
                     }
                 }
@@ -71,11 +79,13 @@ Sudoku::Sudoku(std::vector<std::vector<int>> grid) {
                         for (int k = x + 1; k < 3; k++) {
                             for (int l = 0; l < 3; l++) {
                                 Clause* at_most_one_sub_grid_2 = new Clause();
+                                std::string name1(std::to_string(3 * i + x) + std::to_string(3 * j + y) + std::to_string(z));
+                                std::string name2(std::to_string(3 * i + k) + std::to_string(3 * j + l) + std::to_string(z));
                                 at_most_one_sub_grid_2->add_literal(
-                                    literals[3 * i + x][3 * j + y][z], true);
+                                    name1, true);
                                 at_most_one_sub_grid_2->add_literal(
-                                    literals[3 * i + k][3 * j + l][z], true);
-                                formula.add_clause(at_most_one_sub_grid_2);
+                                    name2, true);
+                                formula->add_clause(at_most_one_sub_grid_2);
                             }
                         }
                     }
@@ -90,12 +100,12 @@ Sudoku::Sudoku(std::vector<std::vector<int>> grid) {
                 continue;
             }
             for (int z = 0; z < 9; z++) {
+                std::string name(std::to_string(x) + std::to_string(y) + std::to_string(z));
                 if (grid[x][y] - 1 == z) {
-                    literals[x][y][z].get()->negate();
+                    formula.get()->assign(name, true);
                 }
-                literals[x][y][z].get()->set_fixed();
-                not_fixed_literals.erase(literals[x][y][z]);
-                formula.unit_propagate(literals[x][y][z]);
+                formula.get()->set_fixed(name);
+                formula.get()->unit_propagate(name);
             }
         }
     }
@@ -106,7 +116,8 @@ std::ostream& operator<<(std::ostream& os, const Sudoku& sudoku) {
         for (int y = 0; y < 9; y++) {
             bool is_fixed = false;
             for (int z = 0; z < 9; z++) {
-                 if (sudoku.literals[x][y][z].get()->value()) {
+                std::string name(std::to_string(x) + std::to_string(y) + std::to_string(z));
+                 if (sudoku.formula.get()->get_literal_value(name)) {
                     os << z+1 << " ";
                     is_fixed = true;
                 }
@@ -121,29 +132,17 @@ std::ostream& operator<<(std::ostream& os, const Sudoku& sudoku) {
 }
 
 void Sudoku::solve() {
-    Clause* c = formula.get_unit_clause();
+    Clause* c = formula.get()->get_unit_clause();
     while (c != nullptr) {
-        std::shared_ptr<Literal> l = c->get_literal();
-
-        int x = l.get()->get_x();
-        int y = l.get()->get_y();
-        int z = l.get()->get_z();
+        std::string l = c->get_literal();
 
         if (!c->is_negative(l)) {
-            l.get()->negate();
+            formula.get()->assign(l, true);
         }
 
-        l.get()->set_fixed();
-        not_fixed_literals.erase(l);
-        formula.unit_propagate(l);
+        formula.get()->set_fixed(l);
+        formula.get()->unit_propagate(l);
 
-        c = formula.get_unit_clause();
-    }
-
-    for (std::unordered_set<std::shared_ptr<Literal>>::const_iterator literal = not_fixed_literals.begin(); literal != not_fixed_literals.end(); literal++) {
-        if (formula.is_pure_literal(*literal)) {
-            std::cout << *literal << std::endl;
-            formula.unit_propagate(*literal);
-        }
+        c = formula.get()->get_unit_clause();
     }
 }
