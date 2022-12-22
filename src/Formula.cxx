@@ -74,6 +74,21 @@ Clause* Formula::get_unit_clause() {
     return nullptr;
 }
 
+void Formula::pure_literal_propagation() {
+    std::vector<std::string> to_fix;
+
+    for (std::unordered_map<std::string, bool>::const_iterator l = assignments_not_fixed.begin(); l != assignments_not_fixed.end(); l++) {
+        if (is_pure_literal(l->first)) {
+            to_fix.push_back(l->first);
+        }
+    }
+
+    for (std::vector<std::string>::const_iterator l = to_fix.begin(); l != to_fix.end(); l++) {
+        set_fixed(*l);
+        unit_propagate(*l);
+    }
+}
+
 bool Formula::is_pure_literal(std::string literal) {
     bool first = true;
     bool negative = false;
@@ -89,6 +104,7 @@ bool Formula::is_pure_literal(std::string literal) {
             }
         }
     }
+    assign(literal, !negative);
     return true;
 }
 

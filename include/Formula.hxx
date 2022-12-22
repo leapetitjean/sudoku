@@ -27,6 +27,7 @@ class Formula {
     bool empty() const;
     void clean();
     Clause* get_unit_clause();
+    void pure_literal_propagation();
     bool is_pure_literal(std::string literal);
     inline bool has_empty_clause() { return empty_clause; };
     friend std::ostream& operator<<(std::ostream& os, const Formula& formula);

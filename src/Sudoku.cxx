@@ -150,7 +150,7 @@ bool Sudoku::dpll(std::shared_ptr<Formula> f) {
         c = f.get()->get_unit_clause();
     }
 
-    // TODO: pure literal
+    f.get()->pure_literal_propagation();
 
     if (f.get()->has_empty_clause()) {
         return false;
