@@ -51,8 +51,8 @@ Sudoku::Sudoku(std::vector<std::vector<int>> grid) {
     }
 
     for (int z = 0; z < 9; z++) {
-        for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < 2; j++) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
                 for (int x = 0; x < 3; x++) {
                     for (int y = 0; y < 3; y++) {
                         for (int k = y + 1; k < 3; k++) {
@@ -72,8 +72,8 @@ Sudoku::Sudoku(std::vector<std::vector<int>> grid) {
     }
 
     for (int z = 0; z < 9; z++) {
-        for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < 2; j++) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
                 for (int x = 0; x < 3; x++) {
                     for (int y = 0; y < 3; y++) {
                         for (int k = x + 1; k < 3; k++) {
@@ -132,17 +132,48 @@ std::ostream& operator<<(std::ostream& os, const Sudoku& sudoku) {
 }
 
 void Sudoku::solve() {
-    Clause* c = formula.get()->get_unit_clause();
+    dpll(formula);
+}
+
+bool Sudoku::dpll(std::shared_ptr<Formula> f) {
+    Clause* c = f.get()->get_unit_clause();
     while (c != nullptr) {
         std::string l = c->get_literal();
 
         if (!c->is_negative(l)) {
-            formula.get()->assign(l, true);
+            f.get()->assign(l, true);
         }
 
-        formula.get()->set_fixed(l);
-        formula.get()->unit_propagate(l);
+        f.get()->set_fixed(l);
+        f.get()->unit_propagate(l);
 
-        c = formula.get()->get_unit_clause();
+        c = f.get()->get_unit_clause();
     }
+
+    // TODO: pure literal
+
+    if (f.get()->has_empty_clause()) {
+        return false;
+    }
+
+    if (f.get()->empty()) {
+        formula = f;
+        return true;
+    }
+
+    std::string l = f.get()->choose_literal();
+
+    std::shared_ptr<Formula> formula1(new Formula(*f.get()));
+    std::shared_ptr<Formula> formula2(new Formula(*f.get()));
+
+    formula1.get()->assign(l, true);
+    formula2.get()->assign(l, false);
+
+    formula1.get()->set_fixed(l);
+    formula2.get()->set_fixed(l);
+    
+    formula1.get()->unit_propagate(l);
+    formula2.get()->unit_propagate(l);
+
+    return dpll(formula1) || dpll(formula2);
 }

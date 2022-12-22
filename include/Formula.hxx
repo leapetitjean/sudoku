@@ -21,6 +21,7 @@ class Formula {
     void assign(std::string literal, bool value);
     void set_fixed(std::string literal);
     bool get_literal_value(std::string literal);
+    std::string choose_literal();
     bool value();
     void unit_propagate(std::string literal);
     bool empty() const;

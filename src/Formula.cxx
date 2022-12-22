@@ -50,6 +50,9 @@ void Formula::clean() {
     std::vector<Clause*>::const_iterator it = clauses.begin();
     while (it != clauses.end()) {
         if ((*it)->empty()) {
+            if (!(*it)->value()) {
+                empty_clause = true;
+            }
             clauses.erase(it);
         } else if ((*it)->value()) {
             clauses.erase(it);
@@ -90,18 +93,22 @@ bool Formula::is_pure_literal(std::string literal) {
 }
 
 void Formula::assign(std::string literal, bool value) {
-    assignments_not_fixed.at(literal) = value;
+    assignments_not_fixed[literal] = value;
 }
 
 void Formula::set_fixed(std::string literal) {
-    bool value = assignments_not_fixed.at(literal);
+    bool value = assignments_not_fixed[literal];
     assignments_not_fixed.erase(literal);
     assignments_fixed.insert(std::make_pair(literal, value));
 }
 
 bool Formula::get_literal_value(std::string literal) {
     if (assignments_not_fixed.find(literal) != assignments_not_fixed.end()) {
-        return assignments_not_fixed.at(literal);
+        return assignments_not_fixed[literal];
     }
-    return assignments_fixed.at(literal);
+    return assignments_fixed[literal];
+}
+
+std::string Formula::choose_literal() {
+    return assignments_not_fixed.begin()->first;
 }
