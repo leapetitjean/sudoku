@@ -29,26 +29,27 @@ void Formula::add_literal(std::string literal) {
 }
 
 void Formula::unit_propagate(std::string literal) {
-    for (std::vector<std::shared_ptr<Clause>>::const_iterator c =
+    for (std::vector<std::shared_ptr<Clause>>::const_iterator clause =
              clauses.begin();
-         c != clauses.end(); c++) {
-        (*c)->unit_propagate(literal, assignments_fixed.at(literal));
+         clause != clauses.end(); clause++) {
+        (*clause)->unit_propagate(literal, assignments_fixed.at(literal));
     }
     clean();
 }
 
 void Formula::clean() {
-    std::vector<std::shared_ptr<Clause>>::const_iterator it = clauses.begin();
-    while (it != clauses.end()) {
-        if ((*it)->empty()) {
-            if (!(*it)->value()) {
+    std::vector<std::shared_ptr<Clause>>::const_iterator clause =
+        clauses.begin();
+    while (clause != clauses.end()) {
+        if ((*clause)->empty()) {
+            if (!(*clause)->value()) {
                 empty_clause = true;
             }
-            clauses.erase(it);
-        } else if ((*it)->value()) {
-            clauses.erase(it);
+            clauses.erase(clause);
+        } else if ((*clause)->value()) {
+            clauses.erase(clause);
         } else {
-            it++;
+            clause++;
         }
     }
 }
@@ -56,11 +57,11 @@ void Formula::clean() {
 bool Formula::empty() const { return clauses.empty(); }
 
 std::shared_ptr<Clause> Formula::get_unit_clause() {
-    for (std::vector<std::shared_ptr<Clause>>::const_iterator c =
+    for (std::vector<std::shared_ptr<Clause>>::const_iterator clause =
              clauses.begin();
-         c != clauses.end(); c++) {
-        if ((*c)->is_unit()) {
-            return *c;
+         clause != clauses.end(); clause++) {
+        if ((*clause)->is_unit()) {
+            return *clause;
         }
     }
     return nullptr;
@@ -69,17 +70,18 @@ std::shared_ptr<Clause> Formula::get_unit_clause() {
 void Formula::pure_literal_propagation() {
     std::vector<std::string> to_propagate;
 
-    for (std::unordered_map<std::string, bool>::const_iterator l =
+    for (std::unordered_map<std::string, bool>::const_iterator assigment =
              assignments_not_fixed.begin();
-         l != assignments_not_fixed.end(); l++) {
-        if (is_pure_literal(l->first)) {
-            to_propagate.push_back(l->first);
+         assigment != assignments_not_fixed.end(); assigment++) {
+        if (is_pure_literal(assigment->first)) {
+            to_propagate.push_back(assigment->first);
         }
     }
 
-    for (std::vector<std::string>::const_iterator l = to_propagate.begin();
-         l != to_propagate.end(); l++) {
-        assign(*l, assignments_not_fixed[*l]);
+    for (std::vector<std::string>::const_iterator literal =
+             to_propagate.begin();
+         literal != to_propagate.end(); literal++) {
+        assign(*literal, assignments_not_fixed[*literal]);
     }
 }
 

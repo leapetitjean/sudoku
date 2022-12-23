@@ -1,4 +1,4 @@
-#include "Clause.hxx"
+#include <Clause.hxx>
 
 Clause::Clause(const Clause& clause) : literals(clause.literals) {
     is_true = clause.is_true;
