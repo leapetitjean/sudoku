@@ -88,15 +88,15 @@ void Formula::pure_literal_propagation() {
 bool Formula::is_pure_literal(std::string literal) {
     bool first = true;
     bool negative = false;
-    for (std::vector<std::shared_ptr<Clause>>::const_iterator c =
+    for (std::vector<std::shared_ptr<Clause>>::const_iterator clause =
              clauses.begin();
-         c != clauses.end(); c++) {
-        if ((*c)->contains(literal)) {
+         clause != clauses.end(); clause++) {
+        if ((*clause)->contains(literal)) {
             if (first) {
-                negative = (*c)->is_negative(literal);
+                negative = (*clause)->is_negative(literal);
                 first = false;
             }
-            if (negative != (*c)->is_negative(literal)) {
+            if (negative != (*clause)->is_negative(literal)) {
                 return false;
             }
         }
@@ -124,10 +124,10 @@ std::string Formula::choose_literal() {
 }
 
 void Formula::unit_clause_propagation() {
-    std::shared_ptr<Clause> c = get_unit_clause();
-    while (c != nullptr) {
-        std::string l = c->get_literal();
-        assign(l, !c->is_negative(l));
-        c = get_unit_clause();
+    std::shared_ptr<Clause> clause = get_unit_clause();
+    while (clause != nullptr) {
+        std::string literal = clause->get_literal();
+        assign(literal, !clause->is_negative(literal));
+        clause = get_unit_clause();
     }
 }
