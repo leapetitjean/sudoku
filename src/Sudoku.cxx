@@ -152,21 +152,7 @@ std::ostream& operator<<(std::ostream& os, const Sudoku& sudoku) {
 void Sudoku::solve() { feasible = dpll(formula); }
 
 bool Sudoku::dpll(std::shared_ptr<Formula> f) {
-    std::shared_ptr<Clause> c = f.get()->get_unit_clause();
-    while (c != nullptr) {
-        std::string l = c->get_literal();
-
-        if (!c->is_negative(l)) {
-            f.get()->assign(l, true);
-        } else {
-            f.get()->assign(l, false);
-        }
-
-        f.get()->unit_propagate(l);
-
-        c = f.get()->get_unit_clause();
-    }
-
+    f.get()->unit_clause_propagation();
     f.get()->pure_literal_propagation();
 
     if (f.get()->has_empty_clause()) {

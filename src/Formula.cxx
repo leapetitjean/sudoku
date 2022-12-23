@@ -132,3 +132,13 @@ bool Formula::get_literal_value(std::string literal) {
 std::string Formula::choose_literal() {
     return assignments_not_fixed.begin()->first;
 }
+
+void Formula::unit_clause_propagation() {
+    std::shared_ptr<Clause> c = get_unit_clause();
+    while (c != nullptr) {
+        std::string l = c->get_literal();
+        assign(l, !c->is_negative(l));
+        unit_propagate(l);
+        c = get_unit_clause();
+    }
+}

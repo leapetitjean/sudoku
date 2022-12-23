@@ -24,6 +24,7 @@ class Formula {
     std::string choose_literal();
     bool value();
     void unit_propagate(std::string literal);
+    void unit_clause_propagation();
     bool empty() const;
     void clean();
     std::shared_ptr<Clause> get_unit_clause();
