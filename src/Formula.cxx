@@ -28,16 +28,6 @@ void Formula::add_literal(std::string literal) {
     assignments_not_fixed.insert(std::make_pair(literal, false));
 }
 
-bool Formula::value() {
-    bool value = true;
-    for (std::vector<std::shared_ptr<Clause>>::const_iterator clause =
-             clauses.begin();
-         clause != clauses.end(); clause++) {
-        value = value && (*clause)->value();
-    }
-    return value;
-}
-
 void Formula::unit_propagate(std::string literal) {
     for (std::vector<std::shared_ptr<Clause>>::const_iterator c =
              clauses.begin();
