@@ -1,4 +1,4 @@
-#include "Formula.hxx"
+#include <Formula.hxx>
 
 Formula::Formula(const Formula& formula)
     : assignments_fixed(formula.assignments_fixed),

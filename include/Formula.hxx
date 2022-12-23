@@ -1,10 +1,11 @@
 #ifndef FORMULA_HXX
 #define FORMULA_HXX
 
-#include <Clause.hxx>
 #include <iostream>
 #include <unordered_set>
 #include <vector>
+
+#include <Clause.hxx>
 
 class Formula {
    private:

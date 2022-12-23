@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 
-#include "Sudoku.hxx"
+#include <Sudoku.hxx>
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {

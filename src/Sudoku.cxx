@@ -1,4 +1,4 @@
-#include "Sudoku.hxx"
+#include <Sudoku.hxx>
 
 Sudoku::Sudoku(std::vector<std::vector<int>> grid) {
     std::shared_ptr<Formula> f(new Formula());
@@ -148,28 +148,7 @@ std::ostream& operator<<(std::ostream& os, const Sudoku& sudoku) {
     return os;
 }
 
-void Sudoku::solve() { feasible = dpll(formula); }
-
-bool Sudoku::dpll(std::shared_ptr<Formula> f) {
-    f.get()->unit_clause_propagation();
-    f.get()->pure_literal_propagation();
-
-    if (f.get()->has_empty_clause()) {
-        return false;
-    }
-
-    if (f.get()->empty()) {
-        formula = f;
-        return true;
-    }
-
-    std::string l = f.get()->choose_literal();
-
-    std::shared_ptr<Formula> formula1(new Formula(*f.get()));
-    std::shared_ptr<Formula> formula2(new Formula(*f.get()));
-
-    formula1.get()->assign(l, true);
-    formula2.get()->assign(l, false);
-
-    return dpll(formula1) || dpll(formula2);
+void Sudoku::solve() { 
+    feasible = solver.DPLL(formula); 
+    formula = solver.get_solution();
 }
