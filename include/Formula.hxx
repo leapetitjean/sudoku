@@ -9,7 +9,6 @@
 class Formula {
    private:
     std::vector<std::shared_ptr<Clause>> clauses;
-    std::vector<std::shared_ptr<Clause>> unit_clauses;
     std::unordered_map<std::string, bool> assignments_not_fixed;
     std::unordered_map<std::string, bool> assignments_fixed;
     bool empty_clause = false;
