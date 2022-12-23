@@ -1,9 +1,6 @@
 #include "Clause.hxx"
 
-Clause::Clause(const Clause& clause) {
-    for (std::unordered_map<std::string, bool>::const_iterator literal = clause.literals.begin(); literal != clause.literals.end(); literal++) {
-        add_literal(literal->first, literal->second);
-    }
+Clause::Clause(const Clause& clause) : literals(clause.literals) {
     is_true = clause.is_true;
 }
 

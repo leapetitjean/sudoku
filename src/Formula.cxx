@@ -1,16 +1,10 @@
 #include "Formula.hxx"
 
-Formula::Formula(const Formula& formula) {
+Formula::Formula(const Formula& formula) : assignments_fixed(formula.assignments_fixed), assignments_not_fixed(formula.assignments_not_fixed) {
     for (std::vector<Clause*>::const_iterator c = formula.clauses.begin();
          c != formula.clauses.end(); c++) {
         Clause* clause = new Clause(**c);
         add_clause(clause);
-    }
-    for (std::unordered_map<std::string, bool>::const_iterator f = formula.assignments_fixed.begin(); f != formula.assignments_fixed.end(); f++) {
-        assignments_fixed.insert(std::make_pair(f->first, f->second));
-    }
-    for (std::unordered_map<std::string, bool>::const_iterator f = formula.assignments_not_fixed.begin(); f != formula.assignments_not_fixed.end(); f++) {
-        assignments_not_fixed.insert(std::make_pair(f->first, f->second));
     }
     empty_clause = formula.empty_clause;
 }
