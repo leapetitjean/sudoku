@@ -20,7 +20,6 @@ class Formula {
     void add_clause(std::shared_ptr<Clause> clause);
     void add_literal(std::string literal);
     void assign(std::string literal, bool value);
-    void set_fixed(std::string literal);
     bool get_literal_value(std::string literal);
     std::string choose_literal();
     bool value();

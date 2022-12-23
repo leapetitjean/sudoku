@@ -79,19 +79,19 @@ std::shared_ptr<Clause> Formula::get_unit_clause() {
 }
 
 void Formula::pure_literal_propagation() {
-    std::vector<std::string> to_fix;
+    std::vector<std::string> to_propagate;
 
     for (std::unordered_map<std::string, bool>::const_iterator l =
              assignments_not_fixed.begin();
          l != assignments_not_fixed.end(); l++) {
         if (is_pure_literal(l->first)) {
-            to_fix.push_back(l->first);
+            to_propagate.push_back(l->first);
         }
     }
 
-    for (std::vector<std::string>::const_iterator l = to_fix.begin();
-         l != to_fix.end(); l++) {
-        set_fixed(*l);
+    for (std::vector<std::string>::const_iterator l = to_propagate.begin();
+         l != to_propagate.end(); l++) {
+        assign(*l, assignments_not_fixed[*l]);
         unit_propagate(*l);
     }
 }
@@ -112,16 +112,12 @@ bool Formula::is_pure_literal(std::string literal) {
             }
         }
     }
-    assign(literal, !negative);
+    assignments_not_fixed[literal] = !negative;
     return true;
 }
 
 void Formula::assign(std::string literal, bool value) {
     assignments_not_fixed[literal] = value;
-}
-
-void Formula::set_fixed(std::string literal) {
-    bool value = assignments_not_fixed[literal];
     assignments_not_fixed.erase(literal);
     assignments_fixed.insert(std::make_pair(literal, value));
 }

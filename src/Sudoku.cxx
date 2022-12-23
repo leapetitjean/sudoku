@@ -115,8 +115,9 @@ Sudoku::Sudoku(std::vector<std::vector<int>> grid) {
                                  std::to_string(z));
                 if (grid[x][y] - 1 == z) {
                     formula.get()->assign(name, true);
+                } else {
+                    formula.get()->assign(name, false);
                 }
-                formula.get()->set_fixed(name);
                 formula.get()->unit_propagate(name);
             }
         }
@@ -157,9 +158,10 @@ bool Sudoku::dpll(std::shared_ptr<Formula> f) {
 
         if (!c->is_negative(l)) {
             f.get()->assign(l, true);
+        } else {
+            f.get()->assign(l, false);
         }
 
-        f.get()->set_fixed(l);
         f.get()->unit_propagate(l);
 
         c = f.get()->get_unit_clause();
@@ -183,9 +185,6 @@ bool Sudoku::dpll(std::shared_ptr<Formula> f) {
 
     formula1.get()->assign(l, true);
     formula2.get()->assign(l, false);
-
-    formula1.get()->set_fixed(l);
-    formula2.get()->set_fixed(l);
 
     formula1.get()->unit_propagate(l);
     formula2.get()->unit_propagate(l);
