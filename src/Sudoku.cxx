@@ -148,7 +148,7 @@ std::ostream& operator<<(std::ostream& os, const Sudoku& sudoku) {
     return os;
 }
 
-void Sudoku::solve() { 
-    feasible = solver.DPLL(formula); 
+void Sudoku::solve() {
+    feasible = solver.DPLL(formula);
     formula = solver.get_solution();
 }

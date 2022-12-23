@@ -1,8 +1,7 @@
+#include <Sudoku.hxx>
 #include <fstream>
 #include <iostream>
 #include <vector>
-
-#include <Sudoku.hxx>
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {

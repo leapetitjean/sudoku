@@ -1,12 +1,11 @@
 #ifndef SUDOKU_HXX
 #define SUDOKU_HXX
 
-#include <iostream>
-#include <vector>
-
 #include <Clause.hxx>
 #include <Formula.hxx>
 #include <Solver.hxx>
+#include <iostream>
+#include <vector>
 
 class Sudoku {
    private:
