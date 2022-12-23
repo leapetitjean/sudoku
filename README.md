@@ -3,22 +3,22 @@
 The goal of this project is to solve sudoku with a SAT solving method.
 Here the implementation is the [Davis–Putnam–Logemann–Loveland (DPLL)](https://en.wikipedia.org/wiki/DPLL_algorithm).
 
-# Prerequisite
+### Prerequisite
 
     sudo apt install g++
     sudo apt install cmake
 
-# Compilation
+### Compilation
 
     mkdir build && cd build
     cmake ..
     make
 
-# Launch
+### Launch
 
     ./sudoku <file_name>
 
-# Data
+### Data
 
 The input data must be like the following (with an extra space at the end):
 
