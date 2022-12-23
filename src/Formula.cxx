@@ -90,7 +90,6 @@ void Formula::pure_literal_propagation() {
     for (std::vector<std::string>::const_iterator l = to_propagate.begin();
          l != to_propagate.end(); l++) {
         assign(*l, assignments_not_fixed[*l]);
-        unit_propagate(*l);
     }
 }
 
