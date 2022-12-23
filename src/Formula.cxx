@@ -120,6 +120,7 @@ void Formula::assign(std::string literal, bool value) {
     assignments_not_fixed[literal] = value;
     assignments_not_fixed.erase(literal);
     assignments_fixed.insert(std::make_pair(literal, value));
+    unit_propagate(literal);
 }
 
 bool Formula::get_literal_value(std::string literal) {
@@ -138,7 +139,6 @@ void Formula::unit_clause_propagation() {
     while (c != nullptr) {
         std::string l = c->get_literal();
         assign(l, !c->is_negative(l));
-        unit_propagate(l);
         c = get_unit_clause();
     }
 }

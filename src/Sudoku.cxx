@@ -118,7 +118,6 @@ Sudoku::Sudoku(std::vector<std::vector<int>> grid) {
                 } else {
                     formula.get()->assign(name, false);
                 }
-                formula.get()->unit_propagate(name);
             }
         }
     }
@@ -171,9 +170,6 @@ bool Sudoku::dpll(std::shared_ptr<Formula> f) {
 
     formula1.get()->assign(l, true);
     formula2.get()->assign(l, false);
-
-    formula1.get()->unit_propagate(l);
-    formula2.get()->unit_propagate(l);
 
     return dpll(formula1) || dpll(formula2);
 }
