@@ -43,9 +43,7 @@ bool Clause::empty() const { return literals.empty(); }
 
 bool Clause::is_unit() { return literals.size() == 1; }
 
-std::string Clause::get_literal() {
-    return literals.begin()->first;
-}
+std::string Clause::get_literal() { return literals.begin()->first; }
 
 bool Clause::is_negative(std::string literal) {
     return literals.find(literal)->second;

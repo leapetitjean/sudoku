@@ -8,7 +8,8 @@
 
 class Formula {
    private:
-    std::vector<Clause*> clauses;
+    std::vector<std::shared_ptr<Clause>> clauses;
+    std::vector<std::shared_ptr<Clause>> unit_clauses;
     std::unordered_map<std::string, bool> assignments_not_fixed;
     std::unordered_map<std::string, bool> assignments_fixed;
     bool empty_clause = false;
@@ -16,7 +17,7 @@ class Formula {
    public:
     Formula() = default;
     Formula(const Formula& formula);
-    void add_clause(Clause* clause);
+    void add_clause(std::shared_ptr<Clause> clause);
     void add_literal(std::string literal);
     void assign(std::string literal, bool value);
     void set_fixed(std::string literal);
@@ -26,7 +27,7 @@ class Formula {
     void unit_propagate(std::string literal);
     bool empty() const;
     void clean();
-    Clause* get_unit_clause();
+    std::shared_ptr<Clause> get_unit_clause();
     void pure_literal_propagation();
     bool is_pure_literal(std::string literal);
     inline bool has_empty_clause() { return empty_clause; };
