@@ -42,9 +42,7 @@ void Formula::unit_propagate(std::string literal) {
     for (std::vector<std::shared_ptr<Clause>>::const_iterator c =
              clauses.begin();
          c != clauses.end(); c++) {
-        if (!(*c)->value()) {
-            (*c)->unit_propagate(literal, assignments_fixed.at(literal));
-        }
+        (*c)->unit_propagate(literal, assignments_fixed.at(literal));
     }
     clean();
 }
