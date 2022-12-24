@@ -21,7 +21,15 @@ std::ostream& operator<<(std::ostream& os, const Formula& formula) {
 }
 
 void Formula::add_clause(std::shared_ptr<Clause> clause) {
-    auto inserted = clauses.insert(clause);
+    std::unordered_map<std::string, bool> literals = clause->get_literals();
+    for (std::unordered_map<std::string, bool>::const_iterator literal = literals.begin(); literal != literals.end(); literal++) {
+        if (literal_in_clauses.find(literal->first) != literal_in_clauses.end()) {
+            literal_in_clauses[literal->first].insert(clause);
+        } else {
+            literal_in_clauses.insert(std::make_pair(literal->first, std::unordered_set<std::shared_ptr<Clause>>{clause}));
+        }
+    }
+    clauses.insert(clause);
 }
 
 void Formula::add_literal(std::string literal) {
@@ -82,16 +90,14 @@ bool Formula::is_pure_literal(std::string literal) {
     bool first = true;
     bool negative = false;
     for (std::unordered_set<std::shared_ptr<Clause>>::const_iterator clause =
-             clauses.begin();
-         clause != clauses.end(); clause++) {
-        if ((*clause)->contains(literal)) {
-            if (first) {
-                negative = (*clause)->is_negative(literal);
-                first = false;
-            }
-            if (negative != (*clause)->is_negative(literal)) {
-                return false;
-            }
+             literal_in_clauses[literal].begin();
+         clause != literal_in_clauses[literal].end(); clause++) {
+        if (first) {
+            negative = (*clause)->is_negative(literal);
+            first = false;
+        }
+        if (negative != (*clause)->is_negative(literal)) {
+            return false;
         }
     }
     assignments_not_fixed[literal] = !negative;

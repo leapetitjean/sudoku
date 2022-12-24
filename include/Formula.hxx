@@ -9,6 +9,7 @@
 class Formula {
    private:
     std::unordered_set<std::shared_ptr<Clause>> clauses;
+    std::unordered_map<std::string, std::unordered_set<std::shared_ptr<Clause>>> literal_in_clauses;
     std::unordered_map<std::string, bool> assignments_not_fixed;
     std::unordered_map<std::string, bool> assignments_fixed;
     bool empty_clause = false;
