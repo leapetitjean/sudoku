@@ -90,7 +90,7 @@ bool Formula::is_pure_literal(std::string literal) {
     std::unordered_set<std::shared_ptr<Clause>>::const_iterator clause = literal_in_clauses[literal].begin();
     bool negative = (*clause)->is_negative(literal);
     clause++;
-    for (std::unordered_set<std::shared_ptr<Clause>>::const_iterator clause;
+    for (clause;
          clause != literal_in_clauses[literal].end(); clause++) {
         if (negative != (*clause)->is_negative(literal)) {
             return false;
