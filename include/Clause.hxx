@@ -21,7 +21,9 @@ class Clause {
     bool is_negative(std::string literal);
     bool contains(std::string literal);
     std::string get_literal();
-    inline std::unordered_map<std::string, bool>& get_literals() { return literals; }
+    inline std::unordered_map<std::string, bool>& get_literals() {
+        return literals;
+    }
     friend std::ostream& operator<<(std::ostream& os, const Clause& clause);
 };
 

@@ -22,11 +22,16 @@ std::ostream& operator<<(std::ostream& os, const Formula& formula) {
 
 void Formula::add_clause(std::shared_ptr<Clause> clause) {
     std::unordered_map<std::string, bool> literals = clause->get_literals();
-    for (std::unordered_map<std::string, bool>::const_iterator literal = literals.begin(); literal != literals.end(); literal++) {
-        if (literal_in_clauses.find(literal->first) != literal_in_clauses.end()) {
+    for (std::unordered_map<std::string, bool>::const_iterator literal =
+             literals.begin();
+         literal != literals.end(); literal++) {
+        if (literal_in_clauses.find(literal->first) !=
+            literal_in_clauses.end()) {
             literal_in_clauses[literal->first].insert(clause);
         } else {
-            literal_in_clauses.insert(std::make_pair(literal->first, std::unordered_set<std::shared_ptr<Clause>>{clause}));
+            literal_in_clauses.insert(std::make_pair(
+                literal->first,
+                std::unordered_set<std::shared_ptr<Clause>>{clause}));
         }
     }
     clauses.insert(clause);
@@ -50,7 +55,9 @@ void Formula::unit_propagate(std::string literal) {
             to_erase.push_back(*clause);
         }
     }
-    for (std::vector<std::shared_ptr<Clause>>::const_iterator clause = to_erase.begin(); clause != to_erase.end(); clause++) {
+    for (std::vector<std::shared_ptr<Clause>>::const_iterator clause =
+             to_erase.begin();
+         clause != to_erase.end(); clause++) {
         clauses.erase(*clause);
     }
 }
@@ -87,11 +94,11 @@ void Formula::pure_literal_propagation() {
 }
 
 bool Formula::is_pure_literal(std::string literal) {
-    std::unordered_set<std::shared_ptr<Clause>>::const_iterator clause = literal_in_clauses[literal].begin();
+    std::unordered_set<std::shared_ptr<Clause>>::const_iterator clause =
+        literal_in_clauses[literal].begin();
     bool negative = (*clause)->is_negative(literal);
     clause++;
-    for (clause;
-         clause != literal_in_clauses[literal].end(); clause++) {
+    for (clause; clause != literal_in_clauses[literal].end(); clause++) {
         if (negative != (*clause)->is_negative(literal)) {
             return false;
         }
