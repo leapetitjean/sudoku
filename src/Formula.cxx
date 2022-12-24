@@ -87,15 +87,11 @@ void Formula::pure_literal_propagation() {
 }
 
 bool Formula::is_pure_literal(std::string literal) {
-    bool first = true;
-    bool negative = false;
-    for (std::unordered_set<std::shared_ptr<Clause>>::const_iterator clause =
-             literal_in_clauses[literal].begin();
+    std::unordered_set<std::shared_ptr<Clause>>::const_iterator clause = literal_in_clauses[literal].begin();
+    bool negative = (*clause)->is_negative(literal);
+    clause++;
+    for (std::unordered_set<std::shared_ptr<Clause>>::const_iterator clause;
          clause != literal_in_clauses[literal].end(); clause++) {
-        if (first) {
-            negative = (*clause)->is_negative(literal);
-            first = false;
-        }
         if (negative != (*clause)->is_negative(literal)) {
             return false;
         }
