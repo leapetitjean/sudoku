@@ -10,6 +10,10 @@ project(
 
 include_directories(include)
 
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "-pg")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
 file(GLOB SOURCES "src/*.cxx")
 
 add_executable(
