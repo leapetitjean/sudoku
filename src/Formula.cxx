@@ -1,8 +1,8 @@
 #include <Formula.hxx>
 
 Formula::Formula(const Formula& formula)
-    : assignments_fixed(formula.assignments_fixed),
-      assignments_not_fixed(formula.assignments_not_fixed) {
+    : assignments_not_fixed(formula.assignments_not_fixed),
+      assignments_fixed(formula.assignments_fixed) {
     for (std::unordered_set<std::shared_ptr<Clause>>::const_iterator c =
              formula.clauses.begin();
          c != formula.clauses.end(); c++) {
@@ -102,10 +102,11 @@ bool Formula::is_pure_literal(std::string literal) {
         literal_in_clauses[literal].begin();
     bool negative = (*clause)->is_negative(literal);
     clause++;
-    for (clause; clause != literal_in_clauses[literal].end(); clause++) {
+    while (clause != literal_in_clauses[literal].end()) {
         if (negative != (*clause)->is_negative(literal)) {
             return false;
         }
+        clause++;
     }
     assignments_not_fixed[literal] = !negative;
     return true;
