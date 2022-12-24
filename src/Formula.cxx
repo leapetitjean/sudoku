@@ -3,7 +3,7 @@
 Formula::Formula(const Formula& formula)
     : assignments_fixed(formula.assignments_fixed),
       assignments_not_fixed(formula.assignments_not_fixed) {
-    for (std::vector<std::shared_ptr<Clause>>::const_iterator c =
+    for (std::unordered_set<std::shared_ptr<Clause>>::const_iterator c =
              formula.clauses.begin();
          c != formula.clauses.end(); c++) {
         std::shared_ptr<Clause> clause(new Clause(**c));
@@ -21,7 +21,7 @@ std::ostream& operator<<(std::ostream& os, const Formula& formula) {
 }
 
 void Formula::add_clause(std::shared_ptr<Clause> clause) {
-    clauses.push_back(clause);
+    auto inserted = clauses.insert(clause);
 }
 
 void Formula::add_literal(std::string literal) {
@@ -29,35 +29,28 @@ void Formula::add_literal(std::string literal) {
 }
 
 void Formula::unit_propagate(std::string literal) {
-    for (std::vector<std::shared_ptr<Clause>>::const_iterator clause =
+    std::vector<std::shared_ptr<Clause>> to_erase;
+    for (std::unordered_set<std::shared_ptr<Clause>>::const_iterator clause =
              clauses.begin();
          clause != clauses.end(); clause++) {
         (*clause)->unit_propagate(literal, assignments_fixed.at(literal));
-    }
-    clean();
-}
-
-void Formula::clean() {
-    std::vector<std::shared_ptr<Clause>>::const_iterator clause =
-        clauses.begin();
-    while (clause != clauses.end()) {
-        if ((*clause)->empty()) {
-            if (!(*clause)->value()) {
-                empty_clause = true;
-            }
-            clauses.erase(clause);
-        } else if ((*clause)->value()) {
-            clauses.erase(clause);
-        } else {
-            clause++;
+        bool value = (*clause)->value();
+        if ((*clause)->empty() && !value) {
+            empty_clause = true;
+            to_erase.push_back(*clause);
+        } else if (value) {
+            to_erase.push_back(*clause);
         }
+    }
+    for (std::vector<std::shared_ptr<Clause>>::const_iterator clause = to_erase.begin(); clause != to_erase.end(); clause++) {
+        clauses.erase(*clause);
     }
 }
 
 bool Formula::empty() const { return clauses.empty(); }
 
 std::shared_ptr<Clause> Formula::get_unit_clause() {
-    for (std::vector<std::shared_ptr<Clause>>::const_iterator clause =
+    for (std::unordered_set<std::shared_ptr<Clause>>::const_iterator clause =
              clauses.begin();
          clause != clauses.end(); clause++) {
         if ((*clause)->is_unit()) {
@@ -88,7 +81,7 @@ void Formula::pure_literal_propagation() {
 bool Formula::is_pure_literal(std::string literal) {
     bool first = true;
     bool negative = false;
-    for (std::vector<std::shared_ptr<Clause>>::const_iterator clause =
+    for (std::unordered_set<std::shared_ptr<Clause>>::const_iterator clause =
              clauses.begin();
          clause != clauses.end(); clause++) {
         if ((*clause)->contains(literal)) {
