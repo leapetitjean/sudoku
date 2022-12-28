@@ -1,8 +1,8 @@
 #include <Formula.hxx>
 
 Formula::Formula(const Formula& formula)
-    : assignments_not_fixed(formula.assignments_not_fixed),
-      assignments_fixed(formula.assignments_fixed) {
+    : literals_not_fixed(formula.literals_not_fixed),
+      assignments(formula.assignments) {
     for (std::unordered_set<std::shared_ptr<Clause>>::const_iterator c =
              formula.clauses.begin();
          c != formula.clauses.end(); c++) {
@@ -41,7 +41,7 @@ void Formula::add_clause(std::shared_ptr<Clause> clause) {
 }
 
 void Formula::add_literal(std::string literal) {
-    assignments_not_fixed.insert(std::make_pair(literal, false));
+    literals_not_fixed.insert(literal);
 }
 
 void Formula::unit_propagate(std::string literal) {
@@ -49,7 +49,7 @@ void Formula::unit_propagate(std::string literal) {
     for (std::unordered_set<std::shared_ptr<Clause>>::const_iterator clause =
              literal_in_clauses[literal].begin();
          clause != literal_in_clauses[literal].end(); clause++) {
-        (*clause)->unit_propagate(literal, assignments_fixed.at(literal));
+        (*clause)->unit_propagate(literal, assignments.at(literal));
         bool value = (*clause)->value();
         if ((*clause)->empty() && !value) {
             empty_clause = true;
@@ -70,8 +70,6 @@ void Formula::unit_propagate(std::string literal) {
     }
 }
 
-bool Formula::empty() const { return clauses.empty(); }
-
 std::shared_ptr<Clause> Formula::get_unit_clause() {
     if (unit_clauses.empty()) {
         return nullptr;
@@ -80,55 +78,53 @@ std::shared_ptr<Clause> Formula::get_unit_clause() {
 }
 
 void Formula::pure_literal_propagation() {
-    std::vector<std::string> to_propagate;
+    std::vector<std::pair<std::string, bool>> to_propagate;
 
-    for (std::unordered_map<std::string, bool>::const_iterator assigment =
-             assignments_not_fixed.begin();
-         assigment != assignments_not_fixed.end(); assigment++) {
-        if (is_pure_literal(assigment->first)) {
-            to_propagate.push_back(assigment->first);
+    for (std::unordered_set<std::string>::const_iterator assigment =
+             literals_not_fixed.begin();
+         assigment != literals_not_fixed.end(); assigment++) {
+        literal_status status = is_pure_literal(*assigment);
+        if (status.status) {
+            to_propagate.push_back(std::make_pair(*assigment, status.value));
         }
     }
 
-    for (std::vector<std::string>::const_iterator literal =
+    for (std::vector<std::pair<std::string, bool>>::const_iterator literal =
              to_propagate.begin();
          literal != to_propagate.end(); literal++) {
-        assign(*literal, assignments_not_fixed[*literal]);
+        assign(literal->first, literal->second);
     }
 }
 
-bool Formula::is_pure_literal(std::string literal) {
+literal_status Formula::is_pure_literal(std::string literal) {
+    literal_status status;
     std::unordered_set<std::shared_ptr<Clause>>::const_iterator clause =
         literal_in_clauses[literal].begin();
     bool negative = (*clause)->is_negative(literal);
     clause++;
     while (clause != literal_in_clauses[literal].end()) {
         if (negative != (*clause)->is_negative(literal)) {
-            return false;
+            status.status = false;
+            return status;
         }
         clause++;
     }
-    assignments_not_fixed[literal] = !negative;
-    return true;
+    status.value = !negative;
+    return status;
 }
 
 void Formula::assign(std::string literal, bool value) {
-    assignments_not_fixed[literal] = value;
-    assignments_not_fixed.erase(literal);
-    assignments_fixed.insert(std::make_pair(literal, value));
+    literals_not_fixed.erase(literal);
+    assignments.insert(std::make_pair(literal, value));
     unit_propagate(literal);
 }
 
 bool Formula::get_literal_value(std::string literal) {
-    if (assignments_not_fixed.find(literal) != assignments_not_fixed.end()) {
-        return assignments_not_fixed[literal];
-    }
-    return assignments_fixed[literal];
+    // TODO status if not found
+    return assignments[literal];
 }
 
-std::string Formula::choose_literal() {
-    return assignments_not_fixed.begin()->first;
-}
+std::string Formula::choose_literal() { return *literals_not_fixed.begin(); }
 
 void Formula::unit_clause_propagation() {
     std::shared_ptr<Clause> clause = get_unit_clause();

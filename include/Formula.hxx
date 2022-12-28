@@ -6,15 +6,22 @@
 #include <unordered_set>
 #include <vector>
 
+struct literal_status {
+    bool status = true;
+    bool value;
+};
+
 class Formula {
    private:
     std::unordered_set<std::shared_ptr<Clause>> clauses;
     std::unordered_set<std::shared_ptr<Clause>> unit_clauses;
     std::unordered_map<std::string, std::unordered_set<std::shared_ptr<Clause>>>
         literal_in_clauses;
-    std::unordered_map<std::string, bool> assignments_not_fixed;
-    std::unordered_map<std::string, bool> assignments_fixed;
+    std::unordered_set<std::string> literals_not_fixed;
+    std::unordered_map<std::string, bool> assignments;
     bool empty_clause = false;
+    std::shared_ptr<Clause> get_unit_clause();
+    literal_status is_pure_literal(std::string literal);
 
    public:
     Formula() = default;
@@ -26,11 +33,9 @@ class Formula {
     std::string choose_literal();
     void unit_propagate(std::string literal);
     void unit_clause_propagation();
-    bool empty() const;
-    std::shared_ptr<Clause> get_unit_clause();
     void pure_literal_propagation();
-    bool is_pure_literal(std::string literal);
-    inline bool has_empty_clause() { return empty_clause; };
+    inline bool empty() const { return clauses.empty(); }
+    inline bool has_empty_clause() { return empty_clause; }
     friend std::ostream& operator<<(std::ostream& os, const Formula& formula);
 };
 
