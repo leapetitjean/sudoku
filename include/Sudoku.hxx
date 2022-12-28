@@ -17,7 +17,6 @@ class Sudoku {
     Sudoku(std::vector<std::vector<int>> grid);
     void solve();
     friend std::ostream& operator<<(std::ostream& os, const Sudoku& sudoku);
-    friend std::string get_name(int x, int y, int z);
 };
 
 #endif  // SUDOKU_HXX
