@@ -21,6 +21,7 @@ class Formula {
     bool empty_clause = false;
 
     std::shared_ptr<Clause> get_unit_clause();
+    void erase(std::shared_ptr<Clause> clause);
     void unit_propagate(std::string literal);
     literal_status is_pure_literal(std::string literal);
 

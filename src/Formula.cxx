@@ -40,27 +40,28 @@ std::shared_ptr<Clause> Formula::get_unit_clause() {
     return *unit_clauses.begin();
 }
 
-void Formula::unit_propagate(std::string literal) {
-    std::vector<std::shared_ptr<Clause>> to_erase;
-    for (std::unordered_set<std::shared_ptr<Clause>>::const_iterator clause =
-             literal_in_clauses[literal].begin();
-         clause != literal_in_clauses[literal].end(); clause++) {
-        (*clause)->unit_propagate(literal, assignments.at(literal));
-        bool value = (*clause)->value();
-        if ((*clause)->empty() && !value) {
-            empty_clause = true;
-            to_erase.push_back(*clause);
-        } else if (value) {
-            to_erase.push_back(*clause);
-        } else if ((*clause)->is_unit()) {
-            unit_clauses.insert(*clause);
-        }
+void Formula::erase(std::shared_ptr<Clause> clause) {
+    clauses.erase(clause);
+    if (unit_clauses.find(clause) != unit_clauses.end()) {
+        unit_clauses.erase(clause);
     }
-    for (std::vector<std::shared_ptr<Clause>>::const_iterator clause = to_erase.begin();
-         clause != to_erase.end(); clause++) {
-        clauses.erase(*clause);
-        if (unit_clauses.find(*clause) != unit_clauses.end()) {
-            unit_clauses.erase(*clause);
+}
+
+void Formula::unit_propagate(std::string literal) {
+    std::unordered_set<std::shared_ptr<Clause>>::const_iterator clause =
+        literal_in_clauses[literal].begin();
+    while (clause != literal_in_clauses[literal].end()) {
+        std::shared_ptr<Clause> current_clause = *clause;
+        clause++;
+        current_clause->unit_propagate(literal, assignments.at(literal));
+        bool value = current_clause->value();
+        if (current_clause->empty() && !value) {
+            empty_clause = true;
+            erase(current_clause);
+        } else if (value) {
+            erase(current_clause);
+        } else if (current_clause->is_unit()) {
+            unit_clauses.insert(current_clause);
         }
     }
 }
