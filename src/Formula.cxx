@@ -92,19 +92,14 @@ literal_status Formula::is_pure_literal(std::string literal) {
 }
 
 void Formula::pure_literal_propagation() {
-    std::vector<std::pair<std::string, bool>> to_propagate;
-
-    for (std::unordered_set<std::string>::const_iterator assigment = literals_not_fixed.begin();
-         assigment != literals_not_fixed.end(); assigment++) {
-        literal_status status = is_pure_literal(*assigment);
+    std::unordered_set<std::string>::const_iterator literal = literals_not_fixed.begin();
+    while (literal != literals_not_fixed.end()) {
+        std::string assigment = *literal;
+        literal++;
+        literal_status status = is_pure_literal(assigment);
         if (status.status) {
-            to_propagate.push_back(std::make_pair(*assigment, status.value));
+            assign(assigment, status.value);
         }
-    }
-
-    for (std::vector<std::pair<std::string, bool>>::const_iterator literal = to_propagate.begin();
-         literal != to_propagate.end(); literal++) {
-        assign(literal->first, literal->second);
     }
 }
 
