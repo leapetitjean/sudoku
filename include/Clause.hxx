@@ -75,6 +75,12 @@ class Clause {
      * @return false if it is not a logical NOT.
      */
     inline bool is_negative(std::string literal) { return literals.find(literal)->second; }
+
+    /**
+     * @brief Get the literals object.
+     *
+     * @return std::unordered_map<std::string, bool>&
+     */
     inline std::unordered_map<std::string, bool>& get_literals() { return literals; }
     friend std::ostream& operator<<(std::ostream& os, const Clause& clause);
 };
